@@ -1,0 +1,33 @@
+---
+- name: Installing Apache Server
+  yum: 
+    name: httpd
+    state: installed
+
+- name: Enabling httpd service and start the service
+  service: 
+    name: httpd
+    enabled: yes
+    state: started
+
+- name: Installing PHP
+  yum:
+    name: 
+      - php 
+      - php-mysql 
+    state: latest
+
+- name: Permit traffic in default zone for http service
+  firewalld:
+     port: 80/tcp
+     permanent: yes
+     state: enabled
+  notify:
+    - reload service firewalld
+
+- name: Copying your php file in the /var/www/html
+  copy:
+    src: index.php
+    dest: /var/www/html/index.php
+    mode: 0664
+

@@ -1,0 +1,58 @@
+---
+- name: Install maraidb Server service
+  yum:
+    name: 
+      - maraidb-server
+      - maraidb-deve1
+      - maraidb-connector-odbc
+      - maraidb-server-utils
+      - python3-pymySQL
+      - php
+    state: latest
+
+- name: Start the maraidb Server service
+  service:
+    name: mysqld
+    enabled: yes
+    state: started
+    
+- name: Update maraidb Server root password
+  mysql_user: 
+    name: root
+    host: localhost
+    password: mysql
+    login_user: root
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+    
+- name: Create a new database called mydb
+  mysql_db: 
+    name: mydb
+    state: present
+    login_user: root
+    login_password: mysql
+
+- name: Copy SQL file
+  copy:
+    src: /root/Ansible_lampstack/demo.sql
+    dest: /tmp/demo.sql
+
+- name: Create table demo with data
+  shell: cat /tmp/demo.sql | mysql -u demo -pdemo demo
+
+- name: Install mysql extension for php
+  yum:
+    name: php-mysqlnd
+    state: present
+
+- name: Restart web service
+  service: 
+    name: httpd
+    state: restarted
+
+- name: Install hello world php script with database
+  copy:
+    src: database.php
+    dest: /var/www/html/database.php
+    mode: 0664
+

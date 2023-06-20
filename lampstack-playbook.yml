@@ -1,0 +1,7 @@
+
+---
+- name: Deploying LAMP stack
+  hosts: webservers
+  roles:
+    - Apache
+    - MariaDB
